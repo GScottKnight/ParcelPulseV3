@@ -6,6 +6,7 @@ import pkg from "../../package.json";
 import { runScrape } from "../commands/scrape";
 import { runValidate } from "../commands/validate";
 import { runCompare } from "../commands/compare";
+import { runPersistCommand } from "../commands/persist";
 
 function readArgValue(argv: string[], flag: string): string | undefined {
   const prefix = `${flag}=`;
@@ -72,6 +73,13 @@ program
   .requiredOption("--out <path>", "Output report path")
   .action(async (opts) => {
     await runCompare({ baselineDir: opts.baseline, llmDir: opts.llm, outPath: opts.out });
+  });
+
+program
+  .command("persist")
+  .requiredOption("--run <path>", "Run directory to persist to the database")
+  .action(async (opts) => {
+    await runPersistCommand({ runDir: opts.run });
   });
 
 program.parseAsync().catch((error) => {
