@@ -12,6 +12,7 @@ yarn-error.log*
 # Build/test artifacts
 coverage/
 *.tsbuildinfo
+drizzle/
 
 # Local data/output
 data/
