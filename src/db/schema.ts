@@ -1,4 +1,14 @@
-import { pgTable, text, timestamp, jsonb, integer, numeric, serial, index, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  jsonb,
+  integer,
+  numeric,
+  serial,
+  index,
+  uniqueIndex
+} from "drizzle-orm/pg-core";
 
 export const runs = pgTable("runs", {
   runId: text("run_id").primaryKey(),
@@ -136,5 +146,47 @@ export const fscBrackets = pgTable(
       table.bracketIndex
     ),
     fscBracketsRunIdx: index("fsc_brackets_run_idx").on(table.runId, table.sourceId)
+  })
+);
+
+export const fuelPricesRaw = pgTable(
+  "fuel_prices_raw",
+  {
+    id: serial("id").primaryKey(),
+    seriesId: text("series_id").notNull(),
+    period: text("period").notNull(), // YYYY-MM-DD
+    value: numeric("value", { precision: 12, scale: 4 }).notNull(),
+    units: text("units").notNull(),
+    description: text("description").notNull(),
+    capturedAt: timestamp("captured_at", { withTimezone: true }).defaultNow().notNull()
+  },
+  (table) => ({
+    fuelPricesRawUnique: uniqueIndex("fuel_prices_raw_unique_idx").on(table.seriesId, table.period)
+  })
+);
+
+export const appliedFsc = pgTable(
+  "applied_fsc",
+  {
+    id: serial("id").primaryKey(),
+    carrier: text("carrier").notNull(),
+    program: text("program").notNull(), // ground, air, international, unknown
+    weekEndingDate: text("week_ending_date").notNull(), // YYYY-MM-DD
+    tableEffectiveDate: text("table_effective_date").notNull(), // YYYY-MM-DD
+    bracketId: text("bracket_id"),
+    bracketRange: text("bracket_range"),
+    appliedPercent: numeric("applied_percent", { precision: 8, scale: 4 }).notNull(),
+    fuelPrice: numeric("fuel_price", { precision: 12, scale: 4 }),
+    fuelIndex: text("fuel_index"),
+    reason: text("reason").notNull(), // table_change | fuel_tier_change | both | no_change
+    sourceRunId: text("source_run_id"), // optional link to scraper run
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull()
+  },
+  (table) => ({
+    appliedFscUnique: uniqueIndex("applied_fsc_unique_idx").on(
+      table.carrier,
+      table.program,
+      table.weekEndingDate
+    )
   })
 );
