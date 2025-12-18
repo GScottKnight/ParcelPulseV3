@@ -9,6 +9,7 @@ import { runCompare } from "../commands/compare";
 import { runPersistCommand } from "../commands/persist";
 import { runFuelCommand } from "../commands/fuel";
 import { runApplyFsc } from "../commands/applyFsc";
+import { runReport } from "../commands/report";
 
 function readArgValue(argv: string[], flag: string): string | undefined {
   const prefix = `${flag}=`;
@@ -107,6 +108,13 @@ program
 program.command("apply-fsc").description("Compute applied FSC from fuel prices and current tables").action(async () => {
   await runApplyFsc();
 });
+
+program
+  .command("report")
+  .option("--out <path>", "Write report to file (markdown). If omitted, prints to stdout.")
+  .action(async (opts) => {
+    await runReport({ outPath: opts.out });
+  });
 
 program.parseAsync().catch((error) => {
   console.error(error instanceof Error ? error.message : error);
