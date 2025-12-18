@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "sources": [
+    {
+      "id": "ups_updates",
+      "carrier": "ups",
+      "mode": "DISCOVERY",
+      "url": "https://www.ups.com/us/en/home.page",
+      "parser_id": "ups_updates_v1",
+      "artifact_type": "html",
+      "diff_enabled": false,
+      "child_source_id": "ups_fuel_surcharges"
+    },
+    {
+      "id": "ups_current_fuel_surcharge",
+      "carrier": "ups",
+      "mode": "DIRECT",
+      "url": "https://www.ups.com/us/en/support/shipping-support/shipping-costs-rates/fuel-surcharges.page",
+      "parser_id": "ups_fsc_html_v1",
+      "artifact_type": "html",
+      "diff_enabled": true
+    },
+    {
+      "id": "ups_fuel_surcharges",
+      "carrier": "ups",
+      "mode": "DIRECT",
+      "url": null,
+      "parser_id": "ups_fsc_pdf_v1",
+      "artifact_type": "pdf",
+      "diff_enabled": true,
+      "discovered_only": true
+    },
+    {
+      "id": "fedex_fuel_surcharge",
+      "carrier": "fedex",
+      "mode": "DIRECT",
+      "url": "https://www.fedex.com/en-us/shipping/fuel-surcharge.html",
+      "parser_id": "fedex_fsc_html_v1",
+      "artifact_type": "html",
+      "diff_enabled": true
+    },
+    {
+      "id": "fedex_shipping_updates",
+      "carrier": "fedex",
+      "mode": "DISCOVERY",
+      "url": "https://www.fedex.com/en-us/shipping/rate-changes.html",
+      "parser_id": "fedex_updates_html_v1",
+      "artifact_type": "html",
+      "diff_enabled": false,
+      "child_source_id": "fedex_fsc_pdf"
+    },
+    {
+      "id": "fedex_fsc_pdf",
+      "carrier": "fedex",
+      "mode": "DIRECT",
+      "url": null,
+      "parser_id": "fedex_fsc_pdf_v1",
+      "artifact_type": "pdf",
+      "diff_enabled": true,
+      "discovered_only": true
+    }
+  ]
+}
