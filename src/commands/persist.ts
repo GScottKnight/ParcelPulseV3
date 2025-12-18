@@ -147,17 +147,18 @@ async function insertSnapshotAndTables(
     );
 
   for (const [tableIndex, table] of parsed.tables.entries()) {
+    const tableValues: typeof schema.fscTables.$inferInsert = {
+      runId,
+      sourceId,
+      capturedAt: capturedAtDate,
+      tableIndex,
+      program: table.program,
+      effectiveDate: table.effective_date,
+      bracketCount: table.brackets.length
+    };
     await db
       .insert(schema.fscTables)
-      .values({
-        runId,
-        sourceId,
-        capturedAt: capturedAtDate,
-        tableIndex,
-        program: table.program,
-        effectiveDate: table.effective_date,
-        bracketCount: table.brackets.length
-      })
+      .values(tableValues)
       .onConflictDoNothing({
         target: [
           schema.fscTables.runId,
@@ -168,21 +169,22 @@ async function insertSnapshotAndTables(
       });
 
     for (const [bracketIndex, bracket] of table.brackets.entries()) {
+      const bracketValues: typeof schema.fscBrackets.$inferInsert = {
+        runId,
+        sourceId,
+        capturedAt: capturedAtDate,
+        tableIndex,
+        bracketIndex,
+        bracketId: bracket.bracket_id,
+        indexRange: bracket.index_range,
+        minIndex: bracket.min_index === null ? null : String(bracket.min_index),
+        maxIndex: bracket.max_index === null ? null : String(bracket.max_index),
+        surchargePercent: bracket.surcharge_percent === null ? null : String(bracket.surcharge_percent),
+        surchargeText: bracket.surcharge_text
+      };
       await db
         .insert(schema.fscBrackets)
-        .values({
-          runId,
-          sourceId,
-          capturedAt: capturedAtDate,
-          tableIndex,
-          bracketIndex,
-          bracketId: bracket.bracket_id,
-          indexRange: bracket.index_range,
-          minIndex: bracket.min_index,
-          maxIndex: bracket.max_index,
-          surchargePercent: bracket.surcharge_percent,
-          surchargeText: bracket.surcharge_text
-        })
+        .values(bracketValues)
         .onConflictDoNothing({
           target: [
             schema.fscBrackets.runId,

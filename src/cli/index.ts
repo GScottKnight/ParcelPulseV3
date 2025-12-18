@@ -7,6 +7,7 @@ import { runScrape } from "../commands/scrape";
 import { runValidate } from "../commands/validate";
 import { runCompare } from "../commands/compare";
 import { runPersistCommand } from "../commands/persist";
+import { runFuelCommand } from "../commands/fuel";
 
 function readArgValue(argv: string[], flag: string): string | undefined {
   const prefix = `${flag}=`;
@@ -80,6 +81,26 @@ program
   .requiredOption("--run <path>", "Run directory to persist to the database")
   .action(async (opts) => {
     await runPersistCommand({ runDir: opts.run });
+  });
+
+program
+  .command("fuel")
+  .option("--series <id...>", "One or more EIA series IDs to fetch", [])
+  .option(
+    "--out <path>",
+    "Optional output path for JSON (array of rows). If omitted, logs to stdout."
+  )
+  .option("--start <date>", "Start date (YYYY-MM-DD)")
+  .option("--end <date>", "End date (YYYY-MM-DD)")
+  .option("--length <n>", "Max rows to fetch (default 500)", (v) => parseInt(v, 10), 500)
+  .action(async (opts) => {
+    await runFuelCommand({
+      seriesIds: opts.series,
+      outPath: opts.out,
+      start: opts.start,
+      end: opts.end,
+      length: opts.length
+    });
   });
 
 program.parseAsync().catch((error) => {
