@@ -158,6 +158,7 @@ export const fuelPricesRaw = pgTable(
     value: numeric("value", { precision: 12, scale: 4 }).notNull(),
     units: text("units").notNull(),
     description: text("description").notNull(),
+    requestParams: jsonb("request_params"),
     capturedAt: timestamp("captured_at", { withTimezone: true }).defaultNow().notNull()
   },
   (table) => ({

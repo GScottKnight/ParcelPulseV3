@@ -1,5 +1,6 @@
 import path from "path";
-import { fetchSeries, writeJson } from "../eia/api";
+import { fetchSeries, writeJson, toFuelPriceRows } from "../eia/api";
+import { insertFuelPrices } from "../db/insertFuel";
 
 const DEFAULT_DIESEL_SERIES = "PET.EMD_EPD2D_PTE_NUS_DPG.W"; // U.S. No 2 Diesel Retail Prices (Dollars per Gallon), weekly
 const DEFAULT_JET_SERIES = "PET.EER_EPJK_PF4_RGC_DPG.W"; // U.S. Gulf Coast Kerosene-Type Jet Fuel Spot Price FOB (Dollars per Gallon), weekly
@@ -31,6 +32,13 @@ export async function runFuelCommand(options: FuelCommandOptions): Promise<void>
       length: options.length
     });
     results[seriesId] = rows;
+
+    // Persist raw rows
+    const mapped = toFuelPriceRows(seriesId, rows);
+    await insertFuelPrices({
+      rows: mapped,
+      requestParams: { start: options.start, end: options.end, length: options.length }
+    });
   }
 
   if (options.outPath) {

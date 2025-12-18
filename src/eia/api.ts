@@ -6,6 +6,14 @@ export interface EiaSeriesRow {
   [key: string]: unknown;
 }
 
+export interface FuelPriceRow {
+  series_id: string;
+  period: string;
+  value: number;
+  units?: string | null;
+  series_description?: string | null;
+}
+
 export interface EiaSeriesResponse {
   response: {
     data: EiaSeriesRow[];
@@ -45,4 +53,14 @@ export async function fetchSeries(options: FetchSeriesOptions): Promise<EiaSerie
 
 export async function writeJson(filePath: string, data: unknown): Promise<void> {
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
+}
+
+export function toFuelPriceRows(seriesId: string, rows: EiaSeriesRow[]): FuelPriceRow[] {
+  return rows.map((row) => ({
+    series_id: seriesId,
+    period: String(row.period),
+    value: Number(row.value),
+    units: typeof row.units === "string" ? row.units : undefined,
+    series_description: typeof row["series-description"] === "string" ? row["series-description"] : undefined
+  }));
 }
